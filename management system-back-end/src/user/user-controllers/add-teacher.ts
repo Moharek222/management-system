@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { Role, User } from "../user-model";
 import { StatusCodes } from "http-status-codes";
 import { body } from "express-validator";
+import bcrypt from "bcrypt";
 
 export const addTeacherValidation = [
     body("name")
@@ -17,6 +18,7 @@ export const addTeacherValidation = [
 
 interface IRequest {
     name: string,
+    email: string,
     password: string,
     role: Role,
     phone: string
@@ -29,8 +31,9 @@ interface IResponse {
 
 export const addTeacher: RequestHandler<{}, IResponse, IRequest> = async (req, res) => {
     try {
-        const { name, password, role, phone } = req.body;
-        const teacher = await User.create({ name, password, role, phone });
+        const { name, password, role, phone ,email } = req.body;
+        const hashed = await bcrypt.hash(password, 10);
+        const teacher = await User.create({ name,email,password: hashed, role, phone });
         res.status(StatusCodes.CREATED).json({
             message: "Teacher added successfully",
             data: teacher

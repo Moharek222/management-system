@@ -6,6 +6,7 @@ import { Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import userRouter from "./src/user/user-router";
 import groupRouter from "./src/group/group-router";
+import authRouter from "./src/auth/auth-router";
 
 
 dotenv.config();
@@ -22,18 +23,19 @@ mongoose
         process.exit(1);
     });
 
-app.use(
-    cors({
-        origin: "http://localhost:3000",
-        credentials: true,
-    }),
-);
+// app.use(
+//     cors({
+//         origin: "http://localhost:3000" ,
+//         credentials: true,
+//     }),
+// );
 app.use(cookieParser());
 app.use(express.static("public"));
 
 app.use(express.json());
 
 
+app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 app.use("/api/group",groupRouter)
 

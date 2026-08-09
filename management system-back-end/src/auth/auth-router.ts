@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { loginHandler } from "./login";
+import { loginHandler, loginValidation } from "./login";
+import { handleValidationErrors } from "../middlewares/handleValidationErrors";
 
 
 
@@ -9,8 +10,8 @@ const router = Router();
 
 
 router.post('/login',
-    // loginValidation,
-    // handleValidationErrors,
+    loginValidation,
+    handleValidationErrors,
     loginHandler);
 
 

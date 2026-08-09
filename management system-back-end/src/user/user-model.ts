@@ -13,6 +13,7 @@ export enum Level {
 
 interface IUser extends mongoose.Document {
     name: string,
+    email?: string,
     group?: mongoose.Types.ObjectId,
     password?: string,
     level: Level,
@@ -29,6 +30,12 @@ const userShcema = new mongoose.Schema<IUser>({
         type: String,
         required: true,
         trim: true
+    },
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true
     },
     password: {
         type: String,

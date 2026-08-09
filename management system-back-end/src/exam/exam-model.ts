@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-interface IResult {
+export interface IResult {
     studentID: mongoose.Types.ObjectId
     marks: number
 }
