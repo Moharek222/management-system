@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 import userRouter from "./src/user/user-router";
 import groupRouter from "./src/group/group-router";
 import authRouter from "./src/auth/auth-router";
+import attendanceRouter from "./src/attendance/attendance-router";
+import examRouter from "./src/exam/exam-router";
 
 
 dotenv.config();
@@ -38,6 +40,8 @@ app.use(express.json());
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 app.use("/api/group",groupRouter)
+app.use("/api/attendance",attendanceRouter)
+app.use("/api/exam",examRouter)
 
 
 // Global Error Handler

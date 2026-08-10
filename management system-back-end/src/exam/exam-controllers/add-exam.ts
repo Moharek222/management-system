@@ -63,15 +63,10 @@ export const addExam: RequestHandler<{ groupID: string }, IRessponse, IRequest> 
         }
 
         const exam = await Exam.create({ groupID, title, date, maxMarks, results })
-        res.status(StatusCodes.CREATED).json({
-            message: "Exam added successfully",
-            data: exam
-        });
         await exam.populate([
             { path: "groupID", select: "name" },
             { path: "results.studentID", select: "name" }
         ]);
-
         res.status(StatusCodes.CREATED).json({
             message: "Exam added successfully",
             data: exam

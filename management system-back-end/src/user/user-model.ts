@@ -33,9 +33,7 @@ const userShcema = new mongoose.Schema<IUser>({
     },
     email: {
         type: String,
-        required: true,
         trim: true,
-        unique: true
     },
     password: {
         type: String,

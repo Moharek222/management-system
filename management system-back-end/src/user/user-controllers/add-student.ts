@@ -40,6 +40,8 @@ interface IRequest {
 }
 interface IResponse {
     message: string,
+    field?: string
+    value?: string
     data?: any
 }
 
@@ -67,10 +69,15 @@ export const addStudent: RequestHandler<{ groupID: string }, IResponse, IRequest
         });
     } catch (err) {
         if ((err as any).code === 11000) {
-            return res.status(400).json({
-                message: "student already exists"
-            });
-        }
+    console.log((err as any).keyPattern);
+    console.log((err as any).keyValue);
+
+    return res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Duplicate value",
+        field: (err as any).keyPattern,
+        value: (err as any).keyValue
+    });
+}
         console.error("Add Student Error:", err);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             message: "Internal server error"

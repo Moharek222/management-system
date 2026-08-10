@@ -21,9 +21,6 @@ import { Role } from "../user/user-model";
 
 export const isAuthorized = (...roles: Role[]): RequestHandler => {
   return (req, res, next) => {
-    console.log("=== Auth Debug ===");
-    console.log("req.user data:", req.user);
-    console.log("Required roles from route:", roles);
 
     if (req.user) {
       if (roles.includes(req.user.role)) {

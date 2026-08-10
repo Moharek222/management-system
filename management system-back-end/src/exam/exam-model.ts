@@ -12,6 +12,7 @@ interface IExam extends mongoose.Document {
     date: string
     maxMarks: number
     results: IResult[]
+    isDeleted?: boolean
     createdAt: Date
     updatedAt: Date
 }
@@ -34,6 +35,10 @@ const examSchema = new mongoose.Schema<IExam>({
         type: Number,
         required: true,
         min: 0
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
     results: {
         type: [

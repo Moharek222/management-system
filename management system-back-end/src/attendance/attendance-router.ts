@@ -11,6 +11,14 @@ import { getAttendanceById } from "./attendance-controllers/get-attendance-by-id
 const router = Router();
 
 
+router.post("/take-attendance/:groupID",
+    isAuthenticated,
+    isAuthorized(Role.ADMIN, Role.TEACHER),
+    takeAttendanceValidation,
+    handleValidationErrors,
+    takeAttendance
+)
+
 router.get("/group/:groupID",
     isAuthenticated,
     isAuthorized(Role.ADMIN, Role.TEACHER),
@@ -22,13 +30,7 @@ router.get("/:id",
     getAttendanceById
 )
 
-router.post("/take-attendance/:groupID",
-        isAuthenticated,
-    isAuthorized(Role.ADMIN, Role.TEACHER),
-    takeAttendanceValidation,
-    handleValidationErrors,
-    takeAttendance
-)
+
 
 
 export default router;
