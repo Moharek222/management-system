@@ -2,8 +2,7 @@ import { RequestHandler } from "express";
 import { body } from "express-validator";
 import { StatusCodes } from "http-status-codes";
 import mongoose, { Error } from "mongoose";
-import { Group } from "../group-model";
-import { Level } from "../../user/user-model";
+import { Group, Level } from "../group-model";
 
 
 

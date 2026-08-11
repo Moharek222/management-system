@@ -1,23 +1,15 @@
 import { RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
-import { Level, Role, User } from "../user-model";
+import {  Role, User } from "../user-model";
 
 
-export const getStudents: RequestHandler<{level: Level}> = async (req, res) => {
+export const getStudents: RequestHandler = async (req, res) => {
     try {
-        const { level } = req.params;
-        // const filter: any = { 
-        //     role: Role.STUDENT,
-        // };
-        // if (level) {
-        //     filter.level = level;
-        // }
         const students = await User.find({
             role: Role.STUDENT,
-            level ,
             isActive: true
         })
-        .populate("group","name level")
+        .populate("group","name phone")
         .sort({ isActive: -1, name: 1 });
         res.status(StatusCodes.OK).json({
             message: "Students fetched successfully",

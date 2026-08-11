@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
-import { Level } from "../user/user-model";
+
+export enum Level {
+    FIRST="first",
+    SECOND="second",
+    THIRD="third"
+}
 
 interface IGroup extends mongoose.Document {
     name: string;
