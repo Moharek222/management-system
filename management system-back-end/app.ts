@@ -9,6 +9,7 @@ import groupRouter from "./src/group/group-router";
 import authRouter from "./src/auth/auth-router";
 import attendanceRouter from "./src/attendance/attendance-router";
 import examRouter from "./src/exam/exam-router";
+import paymentRouter from "./src/payment/payment-router";
 
 
 dotenv.config();
@@ -42,6 +43,7 @@ app.use("/api/user",userRouter)
 app.use("/api/group",groupRouter)
 app.use("/api/attendance",attendanceRouter)
 app.use("/api/exam",examRouter)
+app.use("/api/payment",paymentRouter)
 
 
 // Global Error Handler
