@@ -1,5 +1,5 @@
 import apiClient from "../../services/apiClient";
-import type { Group, ApiResponse, AcademicLevel } from "../../types";
+import type { Group, User, ApiResponse, AcademicLevel } from "../../types";
 
 export interface GetGroupsParams {
   level?: AcademicLevel;
@@ -24,6 +24,11 @@ export const getGroupsApi = async (params?: GetGroupsParams): Promise<ApiRespons
 
 export const getGroupByIdApi = async (id: string): Promise<ApiResponse<Group>> => {
   const response = await apiClient.get<ApiResponse<Group>>(`/api/group/${id}`);
+  return response.data;
+};
+
+export const getGroupStudentsApi = async (groupId: string): Promise<ApiResponse<User[]>> => {
+  const response = await apiClient.get<ApiResponse<User[]>>(`/api/group/${groupId}/students`);
   return response.data;
 };
 
