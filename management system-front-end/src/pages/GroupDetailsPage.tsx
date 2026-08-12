@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getGroupByIdApi, getGroupStudentsApi } from "../features/groups/api";
 import { addStudentToGroupApi, deleteStudentApi } from "../features/students/api";
 import { getGroupAttendanceApi } from "../features/attendance/api";
+import { getGroupPaymentsApi, getPaymentByIdApi } from "../features/payments/api";
 import {
   GroupHeaderCard,
   StudentControlBar,
@@ -11,22 +12,28 @@ import {
   DeleteStudentModal,
 } from "../features/students/components";
 import { TakeAttendanceModal } from "../features/attendance/components";
+import { RecordPaymentModal } from "../features/payments/components";
 import { ROUTES } from "../routes/paths";
-import type { Group, User, AttendanceSheet } from "../types";
+import type { Group, User, AttendanceSheet, Payment } from "../types";
 import type { ApiErrorResponse } from "../services/apiClient";
 
 export const GroupDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Data State
+
   const [group, setGroup] = useState<Group | null>(null);
   const [students, setStudents] = useState<User[]>([]);
   const [attendanceSheets, setAttendanceSheets] = useState<AttendanceSheet[]>([]);
+  const [paymentSheets, setPaymentSheets] = useState<Payment[]>([]);
+
   const [isGroupLoading, setIsGroupLoading] = useState(true);
   const [isStudentsLoading, setIsStudentsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+
+
+  const [activeTab, setActiveTab] = useState<"attendance" | "payments">("attendance");
 
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -40,14 +47,13 @@ export const GroupDetailsPage: React.FC = () => {
   const [isSavingStudent, setIsSavingStudent] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-
   const [deletingStudent, setDeletingStudent] = useState<User | null>(null);
   const [isDeletingStudent, setIsDeletingStudent] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
 
   const [isTakeAttendanceModalOpen, setIsTakeAttendanceModalOpen] = useState(false);
-
+  const [isRecordPaymentModalOpen, setIsRecordPaymentModalOpen] = useState(false);
 
   const fetchGroupDetails = async () => {
     if (!id) return;
@@ -90,12 +96,37 @@ export const GroupDetailsPage: React.FC = () => {
     }
   };
 
+  const fetchPaymentSheets = useCallback(async () => {
+    if (!id) return;
+
+    try {
+      const response = await getGroupPaymentsApi(id, { page: 1, limit: 20 });
+      const sheets = response.data || [];
+
+
+      const detailedSheets = await Promise.all(
+        sheets.map(async (sheet) => {
+          try {
+            const detailRes = await getPaymentByIdApi(sheet._id);
+            return detailRes.data || sheet;
+          } catch {
+            return sheet;
+          }
+        })
+      );
+
+      setPaymentSheets(detailedSheets);
+    } catch (err: any) {
+      console.error("Fetch group payments error:", err);
+    }
+  }, [id]);
+
   useEffect(() => {
     fetchGroupDetails();
     fetchStudents();
     fetchAttendanceSheets();
-  }, [id]);
-
+    fetchPaymentSheets();
+  }, [id, fetchPaymentSheets]);
 
   const filteredStudents = useMemo(() => {
     if (!searchQuery.trim()) return students;
@@ -107,7 +138,6 @@ export const GroupDetailsPage: React.FC = () => {
         (s.parentPhone && s.parentPhone.includes(query))
     );
   }, [students, searchQuery]);
-
 
   const handleOpenAddModal = () => {
     setEditingStudent(null);
@@ -257,6 +287,9 @@ export const GroupDetailsPage: React.FC = () => {
         totalStudents={students.length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onOpenRecordPaymentModal={() => setIsRecordPaymentModalOpen(true)}
       />
 
 
@@ -265,6 +298,8 @@ export const GroupDetailsPage: React.FC = () => {
         isLoading={isStudentsLoading}
         searchQuery={searchQuery}
         attendanceSheets={attendanceSheets}
+        paymentSheets={paymentSheets}
+        viewMode={activeTab}
         onEdit={handleOpenEditModal}
         onDelete={setDeletingStudent}
         onOpenAddModal={handleOpenAddModal}
@@ -308,6 +343,19 @@ export const GroupDetailsPage: React.FC = () => {
           fetchAttendanceSheets();
         }}
         onClose={() => setIsTakeAttendanceModalOpen(false)}
+      />
+
+
+      <RecordPaymentModal
+        isOpen={isRecordPaymentModalOpen}
+        groupId={id || null}
+        groupName={group?.name || ""}
+        existingPayments={paymentSheets}
+        onClose={() => setIsRecordPaymentModalOpen(false)}
+        onSuccess={(msg) => {
+          showToast(msg);
+          fetchPaymentSheets();
+        }}
       />
     </div>
   );
