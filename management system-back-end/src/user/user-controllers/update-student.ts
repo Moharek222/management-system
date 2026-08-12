@@ -41,7 +41,6 @@ interface IRequest {
     phone?: string;
     parentPhone?: string;
     group?: string;
-    level?: string;
 }
 
 interface IResponse {
@@ -58,7 +57,7 @@ export const updateStudent: RequestHandler<{ id: string }, IResponse, IRequest> 
             });
 
         }
-        const { name, phone, parentPhone, group, level } = req.body;
+        const { name, phone, parentPhone, group } = req.body;
         const updateData: any = {};
         if (name) {
             updateData.name = name;
@@ -71,9 +70,6 @@ export const updateStudent: RequestHandler<{ id: string }, IResponse, IRequest> 
         }
         if (group) {
             updateData.group = group;
-        }
-        if (level) {
-            updateData.level = level;
         }
         if (Object.keys(updateData).length === 0) {
             return res.status(StatusCodes.BAD_REQUEST).json({

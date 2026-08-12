@@ -4,6 +4,7 @@ import { handleValidationErrors } from "../middlewares/handleValidationErrors";
 import { addStudentValidation, addStudent } from "./user-controllers/add-student";
 import { getStudents } from "./user-controllers/get-students";
 import { getStudentByID } from "./user-controllers/get-student-by-id";
+import { toggleStudentStatus } from "./user-controllers/toggle-student-status";
 
 
 
@@ -20,13 +21,17 @@ router.post("/add-teacher",
     handleValidationErrors,
     addTeacher);
 
-router.get("students/:level",
-    getStudents)
+router.get("students",
+    getStudents
+)
 
 router.get("student/:id",
     getStudentByID
 )
 
+router.delete("/:id",
+    toggleStudentStatus
+)
 
 
 export default router;

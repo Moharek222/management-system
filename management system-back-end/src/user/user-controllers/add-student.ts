@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { Level, User } from "../user-model";
+import {  User } from "../user-model";
 import { StatusCodes } from "http-status-codes";
 import { body } from "express-validator";
 import mongoose from "mongoose";
@@ -25,18 +25,13 @@ export const addStudentValidation = [
             }
             return true;
         }),
-
-    body("level")
-        .notEmpty().withMessage("Academic level is required")
-        .isIn(Object.values(Level)).withMessage("Invalid academic level"),
-
 ];
 
 interface IRequest {
     name: string;
     phone: string;
     parentPhone?: string;
-    level: Level
+    // level: Level
 }
 interface IResponse {
     message: string,
@@ -55,13 +50,12 @@ export const addStudent: RequestHandler<{ groupID: string }, IResponse, IRequest
                 message: "Invalid group ID"
             });
         }
-        const { name, phone, parentPhone, level } = req.body;
+        const { name, phone, parentPhone } = req.body;
         const student = await User.create({
             name,
             group: groupID,
             phone,
-            parentPhone,
-            level
+            parentPhone
         });
         res.status(StatusCodes.CREATED).json({
             message: "Student added successfully",

@@ -5,18 +5,14 @@ export enum Role {
     TEACHER = "teacher",
     STUDENT = "student",
 }
-export enum Level {
-    FIRST="first",
-    SECOND="second",
-    THIRD="third"
-}
+
 
 interface IUser extends mongoose.Document {
     name: string,
     email?: string,
     group?: mongoose.Types.ObjectId,
     password?: string,
-    level: Level,
+    // level: Level,
     phone: string,
     parentPhone?: string,
     role?: Role,
@@ -41,10 +37,10 @@ const userShcema = new mongoose.Schema<IUser>({
         select: false
 
     },
-    level: {
-        type: String,
-        enum: Object.values(Level),
-    },
+    // level: {
+    //     type: String,
+    //     enum: Object.values(Level),
+    // },
     group: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Group",
@@ -52,8 +48,7 @@ const userShcema = new mongoose.Schema<IUser>({
     phone: {
         type: String,
         required: true,
-        trim: true,
-        unique: true
+        trim: true
     },
     parentPhone: {
         type: String,
