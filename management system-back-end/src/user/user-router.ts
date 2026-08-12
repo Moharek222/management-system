@@ -5,6 +5,7 @@ import { addStudentValidation, addStudent } from "./user-controllers/add-student
 import { getStudents } from "./user-controllers/get-students";
 import { getStudentByID } from "./user-controllers/get-student-by-id";
 import { toggleStudentStatus } from "./user-controllers/toggle-student-status";
+import { updateStudent, updateStudentValidator } from "./user-controllers/update-student";
 
 
 
@@ -27,6 +28,12 @@ router.get("students",
 
 router.get("student/:id",
     getStudentByID
+)
+
+router.put("student/:id",
+    updateStudentValidator,
+    handleValidationErrors,
+    updateStudent
 )
 
 router.delete("/:id",
