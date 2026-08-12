@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getGroupByIdApi, getGroupStudentsApi } from "../features/groups/api";
 import { addStudentToGroupApi, deleteStudentApi } from "../features/students/api";
+import { getGroupAttendanceApi } from "../features/attendance/api";
 import {
   GroupHeaderCard,
   StudentControlBar,
@@ -9,8 +10,9 @@ import {
   StudentFormModal,
   DeleteStudentModal,
 } from "../features/students/components";
+import { TakeAttendanceModal } from "../features/attendance/components";
 import { ROUTES } from "../routes/paths";
-import type { Group, User } from "../types";
+import type { Group, User, AttendanceSheet } from "../types";
 import type { ApiErrorResponse } from "../services/apiClient";
 
 export const GroupDetailsPage: React.FC = () => {
@@ -20,15 +22,16 @@ export const GroupDetailsPage: React.FC = () => {
   // Data State
   const [group, setGroup] = useState<Group | null>(null);
   const [students, setStudents] = useState<User[]>([]);
+  const [attendanceSheets, setAttendanceSheets] = useState<AttendanceSheet[]>([]);
   const [isGroupLoading, setIsGroupLoading] = useState(true);
   const [isStudentsLoading, setIsStudentsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Toast
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Add / Edit Modal State
+
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<User | null>(null);
   const [studentName, setStudentName] = useState("");
@@ -37,12 +40,15 @@ export const GroupDetailsPage: React.FC = () => {
   const [isSavingStudent, setIsSavingStudent] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Delete Modal State
+
   const [deletingStudent, setDeletingStudent] = useState<User | null>(null);
   const [isDeletingStudent, setIsDeletingStudent] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  // Data Fetching
+
+  const [isTakeAttendanceModalOpen, setIsTakeAttendanceModalOpen] = useState(false);
+
+
   const fetchGroupDetails = async () => {
     if (!id) return;
     setIsGroupLoading(true);
@@ -73,12 +79,24 @@ export const GroupDetailsPage: React.FC = () => {
     }
   };
 
+  const fetchAttendanceSheets = async () => {
+    if (!id) return;
+
+    try {
+      const response = await getGroupAttendanceApi(id, { page: 1, limit: 20 });
+      setAttendanceSheets(response.data || []);
+    } catch (err: any) {
+      console.error("Fetch group attendance error:", err);
+    }
+  };
+
   useEffect(() => {
     fetchGroupDetails();
     fetchStudents();
+    fetchAttendanceSheets();
   }, [id]);
 
-  // Client Search Filter
+
   const filteredStudents = useMemo(() => {
     if (!searchQuery.trim()) return students;
     const query = searchQuery.trim().toLowerCase();
@@ -90,7 +108,7 @@ export const GroupDetailsPage: React.FC = () => {
     );
   }, [students, searchQuery]);
 
-  // Modal Handlers
+
   const handleOpenAddModal = () => {
     setEditingStudent(null);
     setStudentName("");
@@ -221,7 +239,7 @@ export const GroupDetailsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 text-right" dir="rtl">
-      {/* Toast Notification */}
+
       {toastMessage && (
         <div className="fixed bottom-6 left-6 z-50 bg-emerald-600 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 text-xs sm:text-sm font-bold animate-bounce">
           <svg className="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -231,27 +249,28 @@ export const GroupDetailsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Group Header Card */}
+
       <GroupHeaderCard group={group} onOpenAddStudentModal={handleOpenAddModal} />
 
-      {/* Student Control Bar */}
+
       <StudentControlBar
         totalStudents={students.length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
 
-      {/* Student Table */}
+
       <StudentTable
         students={filteredStudents}
         isLoading={isStudentsLoading}
         searchQuery={searchQuery}
+        attendanceSheets={attendanceSheets}
         onEdit={handleOpenEditModal}
         onDelete={setDeletingStudent}
         onOpenAddModal={handleOpenAddModal}
       />
 
-      {/* Add / Edit Student Modal */}
+
       <StudentFormModal
         isOpen={isFormModalOpen}
         editingStudent={editingStudent}
@@ -267,7 +286,7 @@ export const GroupDetailsPage: React.FC = () => {
         onClose={() => setIsFormModalOpen(false)}
       />
 
-      {/* Delete / Toggle Student Modal */}
+
       <DeleteStudentModal
         deletingStudent={deletingStudent}
         isDeleting={isDeletingStudent}
@@ -277,6 +296,18 @@ export const GroupDetailsPage: React.FC = () => {
           setDeletingStudent(null);
           setDeleteError(null);
         }}
+      />
+
+
+      <TakeAttendanceModal
+        isOpen={isTakeAttendanceModalOpen}
+        groupId={id || null}
+        groupName={group?.name || ""}
+        onSuccess={(msg) => {
+          showToast(msg);
+          fetchAttendanceSheets();
+        }}
+        onClose={() => setIsTakeAttendanceModalOpen(false)}
       />
     </div>
   );

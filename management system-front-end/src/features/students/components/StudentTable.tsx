@@ -1,19 +1,33 @@
 import React from "react";
-import type { User } from "../../../types";
+import type { User, AttendanceSheet } from "../../../types";
 
 interface StudentTableProps {
   students: User[];
   isLoading: boolean;
   searchQuery: string;
+  attendanceSheets?: AttendanceSheet[];
   onEdit: (student: User) => void;
   onDelete: (student: User) => void;
   onOpenAddModal: () => void;
 }
 
+
+const formatShortDate = (dateStr: string): string => {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    const day = parseInt(parts[2], 10);
+    const month = parseInt(parts[1], 10);
+    return `${day}/${month}`;
+  }
+  return dateStr;
+};
+
 export const StudentTable: React.FC<StudentTableProps> = ({
   students,
   isLoading,
   searchQuery,
+  attendanceSheets = [],
   onEdit,
   onDelete,
   onOpenAddModal,
@@ -57,58 +71,154 @@ export const StudentTable: React.FC<StudentTableProps> = ({
     );
   }
 
+
+  const displayedSheets = [...attendanceSheets].reverse();
+
   return (
     <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-xs">
+
+      {displayedSheets.length === 0 && (
+        <div className="bg-slate-50 border-b border-slate-100 px-5 py-2.5 text-slate-400 text-[11px] font-bold flex items-center gap-2">
+          <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>لم يتم تسجيل أي حصص حضور لهذه المجموعة حتى الآن</span>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-right text-xs border-collapse">
           <thead className="bg-slate-50/90 border-b border-slate-100 text-slate-500 font-bold">
             <tr>
               <th className="py-3.5 px-4 text-center w-12 shrink-0">#</th>
-              <th className="py-3.5 px-4 sticky right-0 bg-slate-50 z-10 border-l border-slate-100/60 min-w-[200px]">
+
+
+              <th className="py-3.5 px-4 sticky right-0 bg-slate-50 z-10 border-l border-slate-100/60 min-w-[190px]">
                 اسم الطالب / رقم الهاتف
               </th>
+
+
+              {displayedSheets.map((sheet) => (
+                <th
+                  key={sheet._id}
+                  className="py-3.5 px-3 text-center min-w-[55px] font-extrabold text-[#ce5071] border-l border-slate-100/60"
+                  title={`حصة يوم ${sheet.date}`}
+                >
+                  <span className="bg-rose-50 border border-rose-200/80 px-2 py-0.5 rounded-lg text-[11px] inline-block">
+                    {formatShortDate(sheet.date)}
+                  </span>
+                </th>
+              ))}
+
+
+              {displayedSheets.length > 0 && (
+                <th className="py-3.5 px-3 text-center min-w-[90px] border-l border-slate-100/60 text-slate-600 font-bold">
+                  ملخص الحضور
+                </th>
+              )}
+
+
               <th className="py-3.5 px-4 text-center">الإجراءات</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
-            {students.map((student, index) => (
-              <tr key={student._id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="py-3.5 px-4 text-center font-bold text-slate-400 w-12">{index + 1}</td>
+            {students.map((student, index) => {
+
+              let studentPresentCount = 0;
+              let studentAbsentCount = 0;
+              let hasRecords = false;
+
+              displayedSheets.forEach((sheet) => {
+                const rec = (sheet.present || []).find((p) => {
+                  const sId = typeof p.studentID === "object" ? (p.studentID as any)._id : p.studentID;
+                  return sId === student._id;
+                });
+
+                if (rec) {
+                  hasRecords = true;
+                  if (rec.isPresent) studentPresentCount++;
+                  else studentAbsentCount++;
+                }
+              });
+
+              return (
+                <tr key={student._id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="py-3.5 px-4 text-center font-bold text-slate-400 w-12">{index + 1}</td>
 
 
-                <td className="py-3.5 px-4 sticky right-0 bg-white z-10 border-l border-slate-100/60">
-                  <div className="font-extrabold text-slate-900 text-sm">{student.name}</div>
-                  <div className="text-[11px] font-mono text-slate-400 dir-ltr text-right mt-0.5">
-                    {student.phone || "-"}
-                  </div>
-                </td>
+                  <td className="py-3.5 px-4 sticky right-0 bg-white z-10 border-l border-slate-100/60">
+                    <div className="font-extrabold text-slate-900 text-sm">{student.name}</div>
+                    <div className="text-[11px] font-mono text-slate-400 dir-ltr text-right mt-0.5">
+                      {student.phone || "-"}
+                    </div>
+                  </td>
 
 
-                <td className="py-3.5 px-4 text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <button
-                      onClick={() => onEdit(student)}
-                      className="p-1.5 text-slate-400 hover:text-[#367ab8] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                      title="تعديل الطالب"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
+                  {displayedSheets.map((sheet) => {
+                    const record = (sheet.present || []).find((p) => {
+                      const sId = typeof p.studentID === "object" ? (p.studentID as any)._id : p.studentID;
+                      return sId === student._id;
+                    });
 
-                    <button
-                      onClick={() => onDelete(student)}
-                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                      title="حذف الطالب"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                    return (
+                      <td key={sheet._id} className="py-3.5 px-2 text-center border-l border-slate-100/60">
+                        {record === undefined ? (
+                          <span className="text-slate-300 font-bold text-xs">—</span>
+                        ) : record.isPresent ? (
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-extrabold text-xs">
+                            ✓
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-100 text-rose-700 font-extrabold text-xs">
+                            ✕
+                          </span>
+                        )}
+                      </td>
+                    );
+                  })}
+
+
+                  {displayedSheets.length > 0 && (
+                    <td className="py-3.5 px-2 text-center border-l border-slate-100/60">
+                      {hasRecords ? (
+                        <div className="inline-flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2 py-1 rounded-xl text-[11px] font-extrabold text-slate-700">
+                          <span className="text-emerald-700">✓ {studentPresentCount}</span>
+                          <span className="text-slate-300">|</span>
+                          <span className="text-rose-600">✕ {studentAbsentCount}</span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-300 font-bold text-xs">—</span>
+                      )}
+                    </td>
+                  )}
+
+
+                  <td className="py-3.5 px-4 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        onClick={() => onEdit(student)}
+                        className="p-1.5 text-slate-400 hover:text-[#367ab8] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                        title="تعديل الطالب"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+
+                      <button
+                        onClick={() => onDelete(student)}
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                        title="حذف الطالب"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

@@ -37,28 +37,28 @@ export const AttendancePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // URL query state (MUST be the ONLY source of group selection)
+
   const groupId = searchParams.get("groupId");
 
-  // Selected Group details state
+
   const [group, setGroup] = useState<Group | null>(null);
   const [isGroupLoading, setIsGroupLoading] = useState(false);
 
-  // Attendance history state
+
   const [sheets, setSheets] = useState<AttendanceSheet[]>([]);
   const [isSheetsLoading, setIsSheetsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Modal & Toast states
+
   const [isTakeAttendanceModalOpen, setIsTakeAttendanceModalOpen] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Pagination state
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalSheets, setTotalSheets] = useState(0);
 
-  // Load Target Group Info only when groupId exists in URL
+
   useEffect(() => {
     let isMounted = true;
 
@@ -94,7 +94,7 @@ export const AttendancePage: React.FC = () => {
     };
   }, [groupId]);
 
-  // Fetch Attendance History function
+
   const fetchHistory = useCallback(async () => {
     if (!groupId || !group?._id) return;
 
@@ -116,18 +116,18 @@ export const AttendancePage: React.FC = () => {
     }
   }, [groupId, group?._id, page]);
 
-  // Trigger fetchHistory when group or page changes
+
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
 
-  // Show Feedback Toast
+
   const showToast = (msg: string) => {
     setSuccessToast(msg);
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
-  // Handle View Details (Navigate to detailed sheet or route)
+
   const handleViewDetails = (sheetId: string) => {
     if (groupId) {
       navigate(`/attendance/${sheetId}?groupId=${groupId}`);
@@ -136,7 +136,7 @@ export const AttendancePage: React.FC = () => {
     }
   };
 
-  // Handler for "+ تسجيل حصة"
+
   const handleOpenTakeAttendanceModal = () => {
     if (!groupId) {
       setError("يرجى اختيار مجموعة من صفحة المجموعات أولاً لتسجيل الحصة.");
@@ -147,7 +147,7 @@ export const AttendancePage: React.FC = () => {
 
   const levelLabel = group ? LEVEL_LABELS[group.level as AcademicLevel] || group.level : "";
 
-  // State when no groupId is provided in the URL
+
   if (!groupId) {
     return (
       <div className="space-y-6 text-right" dir="rtl">
@@ -240,7 +240,7 @@ export const AttendancePage: React.FC = () => {
         </button>
       </div>
 
-      {/* Error Banner */}
+
       {error && (
         <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -261,7 +261,7 @@ export const AttendancePage: React.FC = () => {
         </div>
       )}
 
-      {/* Attendance History Cards Grid */}
+
       <AttendanceHistoryList
         sheets={sheets}
         isLoading={isSheetsLoading || isGroupLoading}
@@ -269,14 +269,14 @@ export const AttendancePage: React.FC = () => {
         onOpenTakeAttendanceModal={handleOpenTakeAttendanceModal}
       />
 
-      {/* Pagination Controls */}
+
       <AttendancePagination
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}
       />
 
-      {/* Take Attendance Modal Dialog */}
+
       <TakeAttendanceModal
         isOpen={isTakeAttendanceModalOpen}
         groupId={groupId}

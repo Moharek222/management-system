@@ -68,6 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
+
       {isOpen && (
         <div
           className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
@@ -75,13 +76,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         />
       )}
 
+
       <aside
-        className={`fixed top-0 right-0 bottom-0 w-64 bg-white border-l border-slate-200/80 z-50 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed top-0 right-0 bottom-0 w-64 bg-white border-l border-slate-200/80 z-50 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
+          }`}
         dir="rtl"
       >
         <div>
+
           <div className="p-5 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <img
@@ -90,10 +92,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 className="w-11 h-11 rounded-xl border-2 border-amber-500/80 p-0.5 object-cover bg-white shadow-sm"
               />
               <div className="text-right">
-                <h1 className="text-sm font-extrabold text-slate-900 leading-tight">أ/ علي عبد القادر</h1>
+                <h1 className="text-sm font-extrabold text-slate-900 leading-tight"> أ\علي عبد القادر</h1>
                 <p className="text-[11px] text-rose-600 font-bold">سلسلة الفولاذ</p>
               </div>
             </div>
+
 
             <button
               onClick={onClose}
@@ -105,6 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
 
+
           <nav className="p-3 space-y-1">
             {navItems.map((item) => (
               <NavLink
@@ -113,10 +117,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 onClick={() => onClose()}
                 end={item.path === ROUTES.DASHBOARD}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                    isActive
-                      ? "bg-[#367ab8] text-white shadow-md shadow-[#367ab8]/25"
-                      : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
+                  `flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${isActive
+                    ? "bg-[#367ab8] text-white shadow-md shadow-[#367ab8]/25"
+                    : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
                   }`
                 }
               >
@@ -126,6 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             ))}
           </nav>
         </div>
+
 
         <div className="p-4 border-t border-slate-100 text-center">
           <p className="text-[11px] text-slate-400/80 font-medium tracking-wide select-none" dir="ltr">

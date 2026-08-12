@@ -13,7 +13,7 @@ interface TakeAttendanceModalProps {
   onClose: () => void;
 }
 
-// Helper to get today's local date in YYYY-MM-DD
+
 const getTodayLocalDate = (): string => {
   const d = new Date();
   const year = d.getFullYear();
@@ -32,12 +32,12 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
   const [date, setDate] = useState<string>(getTodayLocalDate());
   const [students, setStudents] = useState<User[]>([]);
   const [attendanceState, setAttendanceState] = useState<Record<string, boolean>>({});
-  
+
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load Group Active Students when modal opens
+
   useEffect(() => {
     if (!isOpen || !groupId) return;
 
@@ -54,7 +54,7 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
         const activeStudents = response.data || [];
         setStudents(activeStudents);
 
-        // Initialize all active students as present = true by default
+
         const initialState: Record<string, boolean> = {};
         activeStudents.forEach((s) => {
           initialState[s._id] = true;
@@ -79,7 +79,7 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Toggle student present/absent state
+
   const handleToggleStudent = (studentId: string, isPresent: boolean) => {
     setAttendanceState((prev) => ({
       ...prev,
@@ -88,12 +88,19 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
   };
 
 
+  const handleSetAll = (isPresent: boolean) => {
+    const newState: Record<string, boolean> = {};
+    students.forEach((s) => {
+      newState[s._id] = isPresent;
+    });
+    setAttendanceState(newState);
+  };
 
-  // Counters
+
   const presentCount = students.filter((s) => attendanceState[s._id] === true).length;
   const absentCount = students.filter((s) => attendanceState[s._id] === false).length;
 
-  // Handle Form Submit
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!groupId) return;
@@ -141,7 +148,7 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
       <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-200 text-right" dir="rtl">
-        {/* Header */}
+
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div>
             <div className="flex items-center gap-2">
@@ -164,7 +171,7 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
           </button>
         </div>
 
-        {/* Error Alert */}
+
         {error && (
           <div className="bg-rose-50 border border-rose-200 text-rose-700 p-3.5 rounded-2xl text-xs font-medium flex items-center gap-2.5">
             <svg className="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +182,7 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Date Picker */}
+
           <div className="space-y-1.5">
             <label htmlFor="attendanceDate" className="text-xs font-bold text-slate-700">
               تاريخ الحصة <span className="text-rose-500">*</span>
@@ -191,21 +198,39 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
             />
           </div>
 
-          {/* Live Counters Bar */}
+
           {!isLoadingStudents && students.length > 0 && (
             <div className="flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-2xl p-3">
               <div className="flex items-center gap-2">
-                <span className="bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-3 py-1.5 rounded-xl">
+                <span className="bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-2.5 py-1 rounded-lg">
                   حاضر: {presentCount}
                 </span>
-                <span className="bg-rose-100 text-rose-800 text-[11px] font-extrabold px-3 py-1.5 rounded-lg">
+                <span className="bg-rose-100 text-rose-800 text-[11px] font-extrabold px-2.5 py-1 rounded-lg">
                   غائب: {absentCount}
                 </span>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleSetAll(true)}
+                  className="text-[11px] font-bold text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  تحديد الكل حاضر
+                </button>
+                <span className="text-slate-300">|</span>
+                <button
+                  type="button"
+                  onClick={() => handleSetAll(false)}
+                  className="text-[11px] font-bold text-rose-700 hover:bg-rose-50 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                >
+                  تحديد الكل غائب
+                </button>
               </div>
             </div>
           )}
 
-          {/* Student Roster List */}
+
           {isLoadingStudents ? (
             <div className="space-y-3 py-2">
               {[1, 2, 3, 4].map((idx) => (
@@ -232,7 +257,7 @@ export const TakeAttendanceModal: React.FC<TakeAttendanceModalProps> = ({
             </div>
           )}
 
-          {/* Action Buttons */}
+
           <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
             <button
               type="button"
