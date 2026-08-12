@@ -7,5 +7,6 @@ export const ROUTES = {
   ATTENDANCE: "/attendance",
   ATTENDANCE_DETAILS: "/attendance/:id",
   EXAMS: "/exams",
+  EXAM_DETAILS: "/exams/:id",
   PAYMENTS: "/payments",
 } as const;

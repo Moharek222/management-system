@@ -57,6 +57,29 @@ export interface Exam {
   updatedAt?: string;
 }
 
+export interface ExamStudentResultItem {
+  studentID: string;
+  marks: number;
+}
+
+export interface CreateExamPayload {
+  title: string;
+  date: string;
+  maxMarks: number;
+  results: ExamStudentResultItem[];
+}
+
+export interface UpdateExamPayload {
+  title?: string;
+  date?: string;
+  maxMarks?: number;
+}
+
+export interface UpdateStudentMarkPayload {
+  studentID: string;
+  marks: number;
+}
+
 export interface Payment {
   _id: string;
   studentID: string | User;

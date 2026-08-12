@@ -12,13 +12,14 @@ import { StudentsPage } from "../pages/StudentsPage";
 import { AttendancePage } from "../pages/AttendancePage";
 import { AttendanceDetailsPage } from "../pages/AttendanceDetailsPage";
 import { ExamsPage } from "../pages/ExamsPage";
+import { ExamDetailsPage } from "../pages/ExamDetailsPage";
 import { PaymentsPage } from "../pages/PaymentsPage";
 import { NotFoundPage } from "../pages/NotFoundPage";
 
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Public Only Routes (Redirect to / if already logged in) */}
+
       <Route
         path={ROUTES.LOGIN}
         element={
@@ -28,7 +29,7 @@ export const AppRoutes: React.FC = () => {
         }
       />
 
-      {/* Protected Routes inside AppLayout (Require authenticated teacher session) */}
+
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
@@ -38,11 +39,12 @@ export const AppRoutes: React.FC = () => {
           <Route path={ROUTES.ATTENDANCE} element={<AttendancePage />} />
           <Route path={ROUTES.ATTENDANCE_DETAILS} element={<AttendanceDetailsPage />} />
           <Route path={ROUTES.EXAMS} element={<ExamsPage />} />
+          <Route path={ROUTES.EXAM_DETAILS} element={<ExamDetailsPage />} />
           <Route path={ROUTES.PAYMENTS} element={<PaymentsPage />} />
         </Route>
       </Route>
 
-      {/* Catch-all 404 Route */}
+
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
