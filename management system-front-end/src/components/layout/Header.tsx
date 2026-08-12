@@ -1,6 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../features/auth/AuthContext";
+import { ROUTES } from "../../routes/paths";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -9,7 +10,8 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+  const location = useLocation();
+
   const formatTeacherName = (name?: string) => {
     if (!name) return "أ. علي";
     if (name.toLowerCase().includes("ali") || name.toLowerCase().includes("abdelkader")) {
@@ -20,9 +22,24 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
 
   const teacherName = formatTeacherName(user?.name);
 
+  const handleBack = () => {
+
+    if (location.pathname.startsWith("/groups/")) {
+      navigate(ROUTES.GROUPS);
+    }
+
+    else if (location.pathname !== ROUTES.DASHBOARD) {
+      navigate(ROUTES.DASHBOARD);
+    }
+
+    else {
+      navigate(-1);
+    }
+  };
+
   return (
     <header className="h-16 bg-[#367ab8] text-white px-4 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-md" dir="rtl">
-      {/* Right Section: Logo & Platform Title */}
+
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
@@ -44,12 +61,12 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
         </div>
       </div>
 
-      {/* Left Section: Back Button */}
+
       <div className="flex items-center gap-3">
         <button
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           className="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:bg-white/30 border border-white/30 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer"
-          title="الرجوع للخلف"
+          title="الرجوع للصفحة الرئيسية"
         >
           <svg className="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />

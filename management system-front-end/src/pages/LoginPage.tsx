@@ -56,8 +56,6 @@ export const LoginPage: React.FC = () => {
           </div>
           <div className="text-right">
             <h2 className="text-xl font-extrabold text-slate-900 leading-tight">الأستاذ / علي عبد القادر</h2>
-            <p className="text-xs text-rose-600 font-bold mt-0.5">سلسلة الفولاذ في الفيزياء والعلوم</p>
-            <p className="text-xs text-slate-500 mt-0.5 font-medium">نظام إدارة المجموعات والدروس</p>
           </div>
         </div>
 
@@ -121,7 +119,6 @@ export const LoginPage: React.FC = () => {
         </form>
       </div>
 
-      {/* Subtle Footer Signature */}
       <footer className="mt-6 text-center text-[11px] text-slate-400/80 font-medium tracking-wide select-none" dir="ltr">
         made by <span className="font-semibold text-slate-500 hover:text-slate-700 transition-colors">ma7arek</span> &amp; <span className="font-semibold text-slate-500 hover:text-slate-700 transition-colors">3zb</span>
       </footer>
