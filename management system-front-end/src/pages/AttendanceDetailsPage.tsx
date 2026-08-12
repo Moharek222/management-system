@@ -59,7 +59,7 @@ export const AttendanceDetailsPage: React.FC = () => {
         const loadedSheet = sheetRes.data || null;
         setSheet(loadedSheet);
 
-        // Fetch Group details for name and level
+
         const targetGroupId = groupIdFromUrl || (typeof loadedSheet?.groupID === "string" ? loadedSheet.groupID : (loadedSheet?.groupID as Group)?._id);
         if (targetGroupId) {
           try {
@@ -87,7 +87,7 @@ export const AttendanceDetailsPage: React.FC = () => {
     };
   }, [attendanceId, groupIdFromUrl]);
 
-  // Target group ID for back navigation
+
   const targetGroupId = groupIdFromUrl || group?._id || (typeof sheet?.groupID === "string" ? sheet.groupID : (sheet?.groupID as Group)?._id);
 
   const handleBack = () => {
@@ -143,7 +143,7 @@ export const AttendanceDetailsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 text-right" dir="rtl">
-      {/* Header Bar */}
+
       <AttendanceDetailsHeader
         groupName={groupName}
         groupLevel={groupLevel}
@@ -152,14 +152,14 @@ export const AttendanceDetailsPage: React.FC = () => {
         onBack={handleBack}
       />
 
-      {/* Summary Cards */}
+
       <AttendanceSummary
         presentCount={presentCount}
         absentCount={absentCount}
         totalStudents={totalStudents}
       />
 
-      {/* Roster Table */}
+
       <AttendanceDetailsTable records={records} />
     </div>
   );

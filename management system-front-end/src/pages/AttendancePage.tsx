@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { getGroupByIdApi } from "../features/groups/api";
 import { getGroupAttendanceApi } from "../features/attendance/api";
 import {
   AttendanceHistoryList,
   AttendancePagination,
+  TakeAttendanceModal,
 } from "../features/attendance/components";
 import { ROUTES } from "../routes/paths";
 import type { Group, AttendanceSheet, AcademicLevel } from "../types";
@@ -36,24 +37,28 @@ export const AttendancePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-
+  // URL query state (MUST be the ONLY source of group selection)
   const groupId = searchParams.get("groupId");
 
-
+  // Selected Group details state
   const [group, setGroup] = useState<Group | null>(null);
   const [isGroupLoading, setIsGroupLoading] = useState(false);
 
-
+  // Attendance history state
   const [sheets, setSheets] = useState<AttendanceSheet[]>([]);
   const [isSheetsLoading, setIsSheetsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Modal & Toast states
+  const [isTakeAttendanceModalOpen, setIsTakeAttendanceModalOpen] = useState(false);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
 
+  // Pagination state
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalSheets, setTotalSheets] = useState(0);
 
-
+  // Load Target Group Info only when groupId exists in URL
   useEffect(() => {
     let isMounted = true;
 
@@ -89,45 +94,60 @@ export const AttendancePage: React.FC = () => {
     };
   }, [groupId]);
 
-
-  useEffect(() => {
+  // Fetch Attendance History function
+  const fetchHistory = useCallback(async () => {
     if (!groupId || !group?._id) return;
 
-    const fetchHistory = async () => {
-      setIsSheetsLoading(true);
+    setIsSheetsLoading(true);
 
-      try {
-        const response = await getGroupAttendanceApi(group._id, {
-          page,
-          limit: 10,
-        });
+    try {
+      const response = await getGroupAttendanceApi(group._id, {
+        page,
+        limit: 10,
+      });
 
-        setSheets(response.data || []);
-        setTotalPages(response.totalPages || 1);
-        setTotalSheets(response.total || 0);
-      } catch (err: any) {
-        setError(getArabicErrorMessage(err, "حدث خطأ أثناء تحميل سجلات الغياب."));
-      } finally {
-        setIsSheetsLoading(false);
-      }
-    };
-
-    fetchHistory();
+      setSheets(response.data || []);
+      setTotalPages(response.totalPages || 1);
+      setTotalSheets(response.total || 0);
+    } catch (err: any) {
+      setError(getArabicErrorMessage(err, "حدث خطأ أثناء تحميل سجلات الغياب."));
+    } finally {
+      setIsSheetsLoading(false);
+    }
   }, [groupId, group?._id, page]);
 
+  // Trigger fetchHistory when group or page changes
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
-  const handleViewDetails = (sheetId: string) => {
-    navigate(`/attendance/${sheetId}`);
+  // Show Feedback Toast
+  const showToast = (msg: string) => {
+    setSuccessToast(msg);
+    setTimeout(() => setSuccessToast(null), 4000);
   };
 
+  // Handle View Details (Navigate to detailed sheet or route)
+  const handleViewDetails = (sheetId: string) => {
+    if (groupId) {
+      navigate(`/attendance/${sheetId}?groupId=${groupId}`);
+    } else {
+      navigate(`/attendance/${sheetId}`);
+    }
+  };
 
+  // Handler for "+ تسجيل حصة"
   const handleOpenTakeAttendanceModal = () => {
-    alert("سيتم إضافة مودال تسجيل الحصة في المهام القادمة (Task 08.3)");
+    if (!groupId) {
+      setError("يرجى اختيار مجموعة من صفحة المجموعات أولاً لتسجيل الحصة.");
+      return;
+    }
+    setIsTakeAttendanceModalOpen(true);
   };
 
   const levelLabel = group ? LEVEL_LABELS[group.level as AcademicLevel] || group.level : "";
 
-
+  // State when no groupId is provided in the URL
   if (!groupId) {
     return (
       <div className="space-y-6 text-right" dir="rtl">
@@ -159,6 +179,16 @@ export const AttendancePage: React.FC = () => {
 
   return (
     <div className="space-y-6 text-right" dir="rtl">
+
+      {successToast && (
+        <div className="fixed bottom-6 left-6 z-50 bg-emerald-600 text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 text-xs sm:text-sm font-bold animate-bounce">
+          <svg className="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{successToast}</span>
+        </div>
+      )}
+
 
       <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -206,11 +236,11 @@ export const AttendancePage: React.FC = () => {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span> تسجيل حصة</span>
+          <span>تسجيل حصة</span>
         </button>
       </div>
 
-
+      {/* Error Banner */}
       {error && (
         <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -231,7 +261,7 @@ export const AttendancePage: React.FC = () => {
         </div>
       )}
 
-
+      {/* Attendance History Cards Grid */}
       <AttendanceHistoryList
         sheets={sheets}
         isLoading={isSheetsLoading || isGroupLoading}
@@ -239,11 +269,23 @@ export const AttendancePage: React.FC = () => {
         onOpenTakeAttendanceModal={handleOpenTakeAttendanceModal}
       />
 
-
+      {/* Pagination Controls */}
       <AttendancePagination
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}
+      />
+
+      {/* Take Attendance Modal Dialog */}
+      <TakeAttendanceModal
+        isOpen={isTakeAttendanceModalOpen}
+        groupId={groupId}
+        groupName={group?.name || ""}
+        onSuccess={(msg) => {
+          showToast(msg);
+          fetchHistory();
+        }}
+        onClose={() => setIsTakeAttendanceModalOpen(false)}
       />
     </div>
   );

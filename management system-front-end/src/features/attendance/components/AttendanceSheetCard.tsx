@@ -53,7 +53,7 @@ export const AttendanceSheetCard: React.FC<AttendanceSheetCardProps> = ({
           {formattedDate || sheet.date}
         </h3>
 
-        {/* Counts summary */}
+
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="bg-emerald-50/80 border border-emerald-100 rounded-2xl p-3 text-center">
             <span className="text-[11px] font-bold text-emerald-700 block">حاضر</span>
