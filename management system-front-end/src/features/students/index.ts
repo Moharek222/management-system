@@ -1,2 +1,1 @@
-// Students feature module placeholder
-export {};
+export * from "./api";

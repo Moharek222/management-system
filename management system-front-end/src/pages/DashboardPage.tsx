@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getGroupsApi } from "../features/groups/api";
-import { getStudentsByLevelApi } from "../features/students/api";
+import { getGroupsApi, getGroupStudentsApi } from "../features/groups/api";
 import { ROUTES } from "../routes/paths";
 import type { AcademicLevel } from "../types";
 
@@ -59,27 +58,38 @@ export const DashboardPage: React.FC = () => {
       const levels: AcademicLevel[] = ["first", "second", "third"];
 
       const promises = levels.map(async (lvl) => {
-        const [groupsRes, studentsRes] = await Promise.allSettled([
-          getGroupsApi({ level: lvl, limit: 100 }),
-          getStudentsByLevelApi(lvl),
-        ]);
+        try {
+          const groupsRes = await getGroupsApi({ level: lvl, limit: 100 });
+          const groupsList = groupsRes.data || [];
+          const groupsCount = groupsRes.total || groupsList.length;
 
-        let groupsCount = 0;
-        let studentsCount = 0;
 
-        if (groupsRes.status === "fulfilled") {
-          groupsCount = groupsRes.value.total || groupsRes.value.data?.length || 0;
+          let studentsCount = 0;
+          if (groupsList.length > 0) {
+            const studentCounts = await Promise.allSettled(
+              groupsList.map((g) => getGroupStudentsApi(g._id))
+            );
+
+            studentsCount = studentCounts.reduce((sum, res) => {
+              if (res.status === "fulfilled" && Array.isArray(res.value.data)) {
+                return sum + res.value.data.length;
+              }
+              return sum;
+            }, 0);
+          }
+
+          return {
+            level: lvl,
+            groupsCount,
+            studentsCount,
+          };
+        } catch (err) {
+          return {
+            level: lvl,
+            groupsCount: 0,
+            studentsCount: 0,
+          };
         }
-
-        if (studentsRes.status === "fulfilled") {
-          studentsCount = studentsRes.value.data?.length || 0;
-        }
-
-        return {
-          level: lvl,
-          groupsCount,
-          studentsCount,
-        };
       });
 
       const results = await Promise.all(promises);
@@ -113,7 +123,7 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="max-w-xl mx-auto space-y-6 py-2 text-right" dir="rtl">
-      {/* Section Header Title with Accent Line matching wireframe */}
+
       <div className="flex items-center gap-2 mb-6">
         <span className="w-1.5 h-6 bg-amber-400 rounded-full"></span>
         <h2 className="text-xl font-extrabold text-[#367ab8] tracking-tight">
@@ -121,7 +131,7 @@ export const DashboardPage: React.FC = () => {
         </h2>
       </div>
 
-      {/* Vertical List of Secondary Level Cards */}
+
       <div className="space-y-4">
         {(["first", "second", "third"] as AcademicLevel[]).map((levelKey) => {
           const item = cardsData[levelKey];
@@ -132,7 +142,7 @@ export const DashboardPage: React.FC = () => {
               onClick={() => handleCardClick(levelKey)}
               className="bg-white border border-slate-100/80 rounded-2xl p-7 shadow-xs hover:shadow-md transition-all flex flex-col items-center justify-center text-center cursor-pointer group hover:border-[#367ab8]/30"
             >
-              {/* Number Badge */}
+
               <div
                 className={`w-11 h-11 rounded-xl flex items-center justify-center font-extrabold text-base mb-3 shadow-xs group-hover:scale-105 transition-transform ${item.badgeBg}`}
               >
@@ -141,12 +151,12 @@ export const DashboardPage: React.FC = () => {
                 </span>
               </div>
 
-              {/* Title */}
+
               <h3 className="text-lg font-black text-slate-800 group-hover:text-[#367ab8] transition-colors">
                 {item.title}
               </h3>
 
-              {/* Subtitle / Counts */}
+
               <p className="text-xs font-semibold text-slate-400 mt-1.5">
                 {item.isLoading ? (
                   <span className="animate-pulse">جاري التحميل...</span>
