@@ -2,10 +2,12 @@
   "name": "management-system",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch app.ts"
+    "dev": "tsx watch app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
