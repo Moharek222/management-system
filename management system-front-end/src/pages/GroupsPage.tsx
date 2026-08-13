@@ -92,8 +92,7 @@ export const GroupsPage: React.FC = () => {
   const handleLevelTabChange = (level: AcademicLevel | "all") => {
     setPage(1);
     if (level === "all") {
-      searchParams.delete("level");
-      setSearchParams(searchParams);
+      setSearchParams({});
     } else {
       setSearchParams({ level });
     }

@@ -195,9 +195,15 @@ export const AttendancePage: React.FC = () => {
           <div className="flex items-center gap-3 mb-2">
             {group && (
               <button
-                onClick={() => navigate(`${ROUTES.GROUPS}/${group._id}`)}
+                onClick={() => {
+                  if (window.history.length > 1) {
+                    navigate(-1);
+                  } else {
+                    navigate(`${ROUTES.GROUPS}/${group._id}`);
+                  }
+                }}
                 className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all cursor-pointer"
-                title="العودة لتفاصيل المجموعة"
+                title="العودة للصفحة السابقة"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />

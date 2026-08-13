@@ -8,7 +8,6 @@ import { LoginPage } from "../pages/LoginPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { GroupsPage } from "../pages/GroupsPage";
 import { GroupDetailsPage } from "../pages/GroupDetailsPage";
-import { StudentsPage } from "../pages/StudentsPage";
 import { AttendancePage } from "../pages/AttendancePage";
 import { AttendanceDetailsPage } from "../pages/AttendanceDetailsPage";
 import { ExamsPage } from "../pages/ExamsPage";
@@ -35,7 +34,6 @@ export const AppRoutes: React.FC = () => {
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
           <Route path={ROUTES.GROUPS} element={<GroupsPage />} />
           <Route path={ROUTES.GROUP_DETAILS} element={<GroupDetailsPage />} />
-          <Route path={ROUTES.STUDENTS} element={<StudentsPage />} />
           <Route path={ROUTES.ATTENDANCE} element={<AttendancePage />} />
           <Route path={ROUTES.ATTENDANCE_DETAILS} element={<AttendanceDetailsPage />} />
           <Route path={ROUTES.EXAMS} element={<ExamsPage />} />
