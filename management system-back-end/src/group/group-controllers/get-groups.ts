@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
-import { Group } from "../group-model";
-import { Level } from "../../user/user-model";
+import { Group, Level } from "../group-model";
+
 
 interface IQuery {
     level?: Level;

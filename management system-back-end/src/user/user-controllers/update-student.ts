@@ -12,14 +12,14 @@ export const updateStudentValidator = [
         .isLength({ min: 3, max: 50 }).withMessage("Name must be between 3 and 50 characters"),
 
     body("phone")
-        .optional()
+        .optional({ checkFalsy: true })
         .isMobilePhone("ar-EG").withMessage("Invalid Egyptian phone number format"),
 
     body("parentPhone")
-        .optional()
+        .optional({ checkFalsy: true })
         .isMobilePhone("ar-EG").withMessage("Invalid parent phone number format")
         .custom((val, { req }) => {
-            if (val === req.body.phone) {
+            if (val && req.body.phone && val === req.body.phone) {
                 throw new Error("Parent phone cannot be the same as student phone");
             }
             return true;

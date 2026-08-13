@@ -14,7 +14,7 @@ interface IUser extends mongoose.Document {
     group?: mongoose.Types.ObjectId,
     password?: string,
     // level: Level,
-    phone: string,
+    phone?: string,
     parentPhone?: string,
     role?: Role,
     isActive?: boolean,
@@ -48,7 +48,7 @@ const userShcema = new mongoose.Schema<IUser>({
     },
     phone: {
         type: String,
-        required: true,
+
         trim: true
     },
     parentPhone: {

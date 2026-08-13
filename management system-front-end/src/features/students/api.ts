@@ -3,7 +3,7 @@ import type { User, ApiResponse, AcademicLevel } from "../../types";
 
 export interface AddStudentPayload {
   name: string;
-  phone: string;
+  phone?: string;
   parentPhone?: string;
 }
 

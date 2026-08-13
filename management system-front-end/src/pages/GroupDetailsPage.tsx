@@ -167,12 +167,7 @@ export const GroupDetailsPage: React.FC = () => {
       return;
     }
 
-    if (!studentPhone.trim()) {
-      setFormError("رقم هاتف الطالب مطلوب");
-      return;
-    }
-
-    if (parentPhone.trim() && parentPhone.trim() === studentPhone.trim()) {
+    if (studentPhone.trim() && parentPhone.trim() && parentPhone.trim() === studentPhone.trim()) {
       setFormError("رقم هاتف ولي الأمر يجب أن يختلف عن رقم الطالب");
       return;
     }
@@ -192,7 +187,7 @@ export const GroupDetailsPage: React.FC = () => {
       } else {
         await addStudentToGroupApi(id, {
           name: studentName.trim(),
-          phone: studentPhone.trim(),
+          phone: studentPhone.trim() || undefined,
           parentPhone: parentPhone.trim() || undefined,
         });
         showToast("تمت إضافة الطالب للمجموعة بنجاح");

@@ -76,7 +76,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
 
           <div className="space-y-1.5">
             <label htmlFor="studentPhone" className="text-xs font-bold text-slate-700">
-              رقم هاتف الطالب <span className="text-rose-500">*</span>
+              رقم هاتف الطالب <span className="text-slate-400 font-normal">(اختياري)</span>
             </label>
             <input
               id="studentPhone"
@@ -84,7 +84,6 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
               placeholder="01012345678"
               value={phone}
               onChange={(e) => onPhoneChange(e.target.value)}
-              required
               dir="ltr"
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 text-left focus:outline-none focus:bg-white focus:border-[#367ab8] focus:ring-4 focus:ring-[#367ab8]/20 transition-all placeholder:text-slate-400"
             />

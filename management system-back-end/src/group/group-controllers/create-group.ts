@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { Group } from "../group-model";
-import { Level } from "../../user/user-model";
+import { Group, Level } from "../group-model";
+
 import { StatusCodes } from "http-status-codes";
 import { body } from "express-validator";
 
