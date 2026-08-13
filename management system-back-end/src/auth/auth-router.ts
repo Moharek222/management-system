@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { loginHandler, loginValidation } from "./login";
 import { handleValidationErrors } from "../middlewares/handleValidationErrors";
+import { refreshToken } from "./refresh-token";
 
 
 
@@ -14,6 +15,5 @@ router.post('/login',
     handleValidationErrors,
     loginHandler);
 
-
-    // router.post("/logout",logoutHandler);
+router.post("/refresh", refreshToken);
 export default router;

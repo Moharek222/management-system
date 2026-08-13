@@ -4,7 +4,6 @@ import { UserToken } from "../interfaces/user-token";
 
 export const isAuthenticated: RequestHandler = (req, res, next) => {
     const { token } = req.cookies;
-    
 
     if (!token) {
         res.status(401).json({ message: "Unauthorized" });
@@ -12,7 +11,7 @@ export const isAuthenticated: RequestHandler = (req, res, next) => {
     }
 
     try {
-        req.user = <UserToken>jwt.verify(token, process.env.secretKey!);
+        req.user = <UserToken>jwt.verify(token, process.env.SECRET_KEY!);
         next();
     } catch (error) {
         res.status(401).json({ message: "Unauthorized, please login" });

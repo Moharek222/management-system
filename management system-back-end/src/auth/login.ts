@@ -7,8 +7,11 @@ import { jwtService } from "../services/jwt-service";
 export const loginValidation = [
         body("email")
                 .trim()
-                .notEmpty().withMessage("Email is required")
-                .isEmail().withMessage("Invalid email format"),
+                .normalizeEmail()
+                .notEmpty()
+                .withMessage("Email is required")
+                .isEmail()
+                .withMessage("Invalid email format"),
         body("password")
                 .notEmpty().withMessage("Password is required"),
 ];
@@ -25,7 +28,7 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
                 const { email, password } = req.body;
 
                 const user = await User.findOne({ email }).select("+password").exec();
-                
+
                 if (!user || !user.password) {
                         return res.status(401).json({ message: "Invalid email or password" });
                 }
@@ -36,7 +39,7 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
                 }
 
                 const token = jwtService.createToken(
-                        { id: user._id, role: user.role }, 
+                        { id: user._id, role: user.role },
                         { expiresIn: "2h" }
                 );
 
@@ -52,7 +55,7 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
 
                 res.cookie("refreshToken", refreshToken, {
                         ...COOKIE_OPTIONS,
-                        maxAge: 7 * 24 * 60 * 60 * 1000, 
+                        maxAge: 7 * 24 * 60 * 60 * 1000,
                 });
 
                 const userObj = user.toObject();
@@ -62,7 +65,7 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
                         message: "Logged in successfully",
                         user: userWithoutPassword
                 });
-                                
+
         } catch (err) {
                 next(err);
         }
