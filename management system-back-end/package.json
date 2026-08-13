@@ -2,7 +2,7 @@
   "name": "management-system",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "app.ts",
   "scripts": {
     "dev": "tsx watch app.ts",
     "build": "tsc",

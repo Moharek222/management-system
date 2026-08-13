@@ -20,19 +20,42 @@ const PORT = Number(process.env.PORT) || 3000;
 const URI = process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
 
-mongoose
-    .connect(`${URI}/${DB_NAME}`)
-    .then(() => console.log("MongoDB connected"))
-    .catch((err) => {
+// MongoDB Connection with caching for serverless environments
+let isConnected = false;
+const connectDB = async () => {
+    if (isConnected || mongoose.connection.readyState >= 1) {
+        isConnected = true;
+        return;
+    }
+    try {
+        const dbUri = DB_NAME && !URI?.includes(DB_NAME) ? `${URI}/${DB_NAME}` : URI;
+        if (dbUri) {
+            await mongoose.connect(dbUri);
+            isConnected = true;
+            console.log("MongoDB connected successfully");
+        }
+    } catch (err) {
         console.error("MongoDB connection error:", err);
-        process.exit(1);
-    });
+    }
+};
+
+connectDB();
+
+// Middleware to ensure DB is connected for incoming requests
+app.use(async (req, res, next) => {
+    await connectDB();
+    next();
+});
+
+const allowedOrigins = process.env.FRONTEND_URL
+    ? [process.env.FRONTEND_URL, "http://localhost:5173"]
+    : (origin: any, callback: any) => callback(null, true);
 
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL,
+        origin: allowedOrigins,
         credentials: true,
-    }),
+    })
 );
 
 app.use(cookieParser());
@@ -55,6 +78,10 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     });
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`✅ Server is running on port ${PORT}`);
-});
+if (process.env.VERCEL !== "1") {
+    app.listen(PORT, "0.0.0.0", () => {
+        console.log(`✅ Server is running on port ${PORT}`);
+    });
+}
+
+export default app;
