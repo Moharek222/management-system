@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
-import { Role, User } from "../user-model";
-import { Level } from "../../group/group-model";
+import { Level, Role, User } from "../user-model";
 
 interface IRequest {
     currentLevel: Level;
@@ -24,12 +23,12 @@ export const promoteStudentsLevel: RequestHandler<{}, IResponse, IRequest> = asy
             return;
         }
         const result = await User.updateMany(
-            {
-                role: Role.STUDENT,
+            { 
+                role: Role.STUDENT, 
                 level: currentLevel,
             },
-            {
-                $set: { level: newLevel }
+            { 
+                $set: { level: newLevel } 
             }
         );
 
@@ -41,7 +40,7 @@ export const promoteStudentsLevel: RequestHandler<{}, IResponse, IRequest> = asy
         }
 
         res.status(StatusCodes.OK).json({
-            message: `Successfully promoted ${result.modifiedCount} students from level ${currentLevel} to ${newLevel}`,
+            message:`Successfully promoted ${result.modifiedCount} students from level ${currentLevel} to ${newLevel}`,
             data: {
                 matchedCount: result.matchedCount,
                 modifiedCount: result.modifiedCount
