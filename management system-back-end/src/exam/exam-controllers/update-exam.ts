@@ -59,7 +59,7 @@ export const updateExam: RequestHandler<{ id: string }, IResponse, IRequest> = a
         const updatedExam = await Exam.findOneAndUpdate(
             { _id: id },
             { $set: updateData },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
         if (!updatedExam) {
             return res.status(StatusCodes.NOT_FOUND).json({

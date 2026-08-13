@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
-import { Level, Role, User } from "../user-model";
+import { Role, User } from "../user-model";
+import { Level } from "../../group/group-model";
 
 interface IRequest {
     currentLevel: Level;
@@ -12,44 +13,49 @@ interface IResponse {
     data?: any;
 }
 
-export const promoteStudentsLevel: RequestHandler<{}, IResponse, IRequest> = async (req, res) => {
+export const promoteStudentsLevel: RequestHandler<{}, IResponse, IRequest> = async (
+    req,
+    res
+) => {
     try {
         const { currentLevel, newLevel } = req.body;
 
         if (currentLevel === newLevel) {
             res.status(StatusCodes.BAD_REQUEST).json({
-                message: "Current level and new level cannot be the same"
+                message: "Current level and new level cannot be the same",
             });
             return;
         }
+
         const result = await User.updateMany(
-            { 
-                role: Role.STUDENT, 
+            {
+                role: Role.STUDENT,
                 level: currentLevel,
             },
-            { 
-                $set: { level: newLevel } 
+            {
+                $set: { level: newLevel },
             }
         );
 
         if (result.matchedCount === 0) {
             res.status(StatusCodes.NOT_FOUND).json({
-                message: `No matched students found in level ${currentLevel}`
+                message: `No matched students found in level ${currentLevel}`,
             });
             return;
         }
 
         res.status(StatusCodes.OK).json({
-            message:`Successfully promoted ${result.modifiedCount} students from level ${currentLevel} to ${newLevel}`,
+            message: `Successfully promoted ${result.modifiedCount} students from level ${currentLevel} to ${newLevel}`,
             data: {
                 matchedCount: result.matchedCount,
-                modifiedCount: result.modifiedCount
-            }
+                modifiedCount: result.modifiedCount,
+            },
         });
     } catch (err) {
         console.log("Promote Students Level Error:", err);
+
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            message: "Internal server error"
+            message: "Internal server error",
         });
     }
 };

@@ -9,7 +9,7 @@ export const deleteExam: RequestHandler<{ id: string }> = async (req, res) => {
         const exam = await Exam.findByIdAndUpdate(
             id,
             { $set: { isDeleted: true } },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!exam) {

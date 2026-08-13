@@ -57,7 +57,7 @@ export const updateStudentMark: RequestHandler<{ id: string }, IResponse, IReque
                 $set: { "results.$.marks": marks } 
             },
             { 
-                new: true,
+                returnDocument: 'after',
                 runValidators: true,
             }
         ).populate("results.studentID", "name");

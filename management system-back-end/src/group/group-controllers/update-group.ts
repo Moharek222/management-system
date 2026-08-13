@@ -52,7 +52,7 @@ export const updateGroup: RequestHandler<{ id: string }, IResponse, IRequest> = 
         const group = await Group.findOneAndUpdate(
             { _id: id },
             {$set:updateData},
-            { new: true , runValidators: true });
+            { returnDocument: 'after', runValidators: true });
         if (!group) {
             return res.status(StatusCodes.NOT_FOUND).json({
                 message: "Group not found"

@@ -43,6 +43,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
   const [paymentState, setPaymentState] = useState<Record<string, boolean>>({});
   const [paidAtState, setPaidAtState] = useState<Record<string, string>>({});
   const [initialPaymentState, setInitialPaymentState] = useState<Record<string, boolean>>({});
+  const [initialPaidAtState, setInitialPaidAtState] = useState<Record<string, string>>({});
 
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
   const [isLoadingSheet, setIsLoadingSheet] = useState(false);
@@ -140,6 +141,7 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
         setPaymentState(initialMap);
         setInitialPaymentState(initialMap);
         setPaidAtState(datesMap);
+        setInitialPaidAtState(datesMap);
         setIsLoadingSheet(false);
       }
     };
@@ -164,6 +166,13 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
         [studentId]: getTodayFormattedDate(),
       }));
     }
+  };
+
+  const handlePaidAtChange = (studentId: string, date: string) => {
+    setPaidAtState((prev) => ({
+      ...prev,
+      [studentId]: date || getTodayFormattedDate(),
+    }));
   };
 
   const handleSetAll = (isPaid: boolean) => {
@@ -195,9 +204,11 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
       return;
     }
 
-    // Filter students whose payment status actually changed
+    // Filter students whose payment status or paidAt date actually changed
     const changedStudents = students.filter(
-      (s) => paymentState[s._id] !== initialPaymentState[s._id]
+      (s) =>
+        paymentState[s._id] !== initialPaymentState[s._id] ||
+        (paymentState[s._id] && paidAtState[s._id] !== initialPaidAtState[s._id])
     );
 
     if (changedStudents.length === 0) {
@@ -227,19 +238,22 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
 
     let successCount = 0;
     let failureCount = 0;
-    const updatedInitial = { ...initialPaymentState };
+    const updatedInitialPayment = { ...initialPaymentState };
+    const updatedInitialPaidAt = { ...initialPaidAtState };
 
     results.forEach((res, idx) => {
       const studentId = changedStudents[idx]._id;
       if (res.status === "fulfilled") {
         successCount++;
-        updatedInitial[studentId] = paymentState[studentId];
+        updatedInitialPayment[studentId] = paymentState[studentId];
+        updatedInitialPaidAt[studentId] = paidAtState[studentId];
       } else {
         failureCount++;
       }
     });
 
-    setInitialPaymentState(updatedInitial);
+    setInitialPaymentState(updatedInitialPayment);
+    setInitialPaidAtState(updatedInitialPaidAt);
     setIsSubmitting(false);
 
     if (failureCount === 0) {
@@ -373,8 +387,10 @@ export const RecordPaymentModal: React.FC<RecordPaymentModalProps> = ({
                   student={student}
                   index={idx}
                   isPaid={paymentState[student._id] ?? false}
+                  paidAt={paidAtState[student._id] || getTodayFormattedDate()}
                   disabled={isSubmitting}
                   onToggle={handleToggle}
+                  onPaidAtChange={handlePaidAtChange}
                 />
               ))}
             </div>

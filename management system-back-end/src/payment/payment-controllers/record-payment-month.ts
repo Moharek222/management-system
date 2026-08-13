@@ -56,7 +56,7 @@ export const recordPaymentMonth: RequestHandler<{ groupID: string },IResponse,IR
                 },
             },
             {
-                new: true,
+                returnDocument: 'after',
                 runValidators: true,
             }
         ).populate("paidList.studentID" , "name phone");
@@ -88,7 +88,7 @@ export const recordPaymentMonth: RequestHandler<{ groupID: string },IResponse,IR
                 },
             },
             {
-                new: true,
+                returnDocument: 'after',
                 upsert: true,
                 runValidators: true,
             }

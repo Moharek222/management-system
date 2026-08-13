@@ -80,7 +80,7 @@ export const updateStudent: RequestHandler<{ id: string }, IResponse, IRequest> 
         const updatedStudent = await User.findOneAndUpdate(
             { _id: id, role: Role.STUDENT },
             { $set: updateData },
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         ).populate("group", "name");
 
         if (!updatedStudent) {

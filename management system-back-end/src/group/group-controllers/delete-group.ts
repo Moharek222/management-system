@@ -18,7 +18,7 @@ export const deleteGroup: RequestHandler<{ id: string }> = async (req, res) => {
         const deletedGroup = await Group.findOneAndUpdate(
             { _id: id, isActive: true },
             { $set: { isActive: false } },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!deletedGroup) {

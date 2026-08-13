@@ -55,7 +55,7 @@ export const takeAttendance: RequestHandler<{ groupID: string }, IResponse, IReq
                 }
             },
             {
-                new: true,
+                returnDocument: 'after',
                 upsert: true, 
                 runValidators: true
             }
