@@ -9,7 +9,7 @@ interface IQuery {
     limit?: string;
 }
 
-export const getGroups: RequestHandler< {} , {} , {} , IQuery> = async (req, res) => {
+export const getGroups: RequestHandler<{}, {}, {}, IQuery> = async (req, res) => {
     try {
         const { level } = req.query;
         const filter: any = {
@@ -28,7 +28,7 @@ export const getGroups: RequestHandler< {} , {} , {} , IQuery> = async (req, res
             .exec();
 
         const total = await Group.countDocuments(filter);
-            res.status(StatusCodes.OK).json({
+        res.status(StatusCodes.OK).json({
             message: "Groups fetched successfully",
             page,
             limit,

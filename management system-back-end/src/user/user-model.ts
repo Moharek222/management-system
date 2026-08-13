@@ -7,6 +7,7 @@ export enum Role {
 }
 
 
+
 interface IUser extends mongoose.Document {
     name: string,
     email?: string,
@@ -63,7 +64,7 @@ const userShcema = new mongoose.Schema<IUser>({
         type: Boolean,
         default: true,
     },
-},{
+}, {
     timestamps: true,
     versionKey: false
 },

@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { Group } from "../group-model";
 import { Level } from "../../user/user-model";
 import { StatusCodes } from "http-status-codes";
-import {body} from "express-validator";
+import { body } from "express-validator";
 
 
 export const addGroupValidation = [
@@ -31,8 +31,9 @@ export const createGroup: RequestHandler<{}, IResponse, IRequest> = async (req, 
         const group = await Group.create({ name, level });
         res.status(StatusCodes.CREATED).json({
             message: "Group created successfully",
-            data: group });
-    } catch (err:any    ) {
+            data: group
+        });
+    } catch (err: any) {
         if (err.code === 11000) {
             res.status(StatusCodes.BAD_REQUEST).json({
                 message: "Group name already exists"
